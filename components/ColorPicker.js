@@ -13,14 +13,11 @@ export default class ColorPicker extends Component {
         three: new Animated.ValueXY()
       },
       scale: new Animated.Value(1),
-      bgColor: [135, 12, 93],
+      bgColor: [],
       height: Dimensions.get('window').height,
       width: Dimensions.get('window').width,
-      circle0PosX: 0,
       circle0PosY: 0,
-      circle1PosX: 0,
       circle1PosY: 0,
-      circle2PosX: 0,
       circle2PosY: 0,
       pans: [this._panResponder, this._panResponder1, this._panResponder2]
     }
@@ -60,10 +57,10 @@ export default class ColorPicker extends Component {
         },
 
         onPanResponderMove: (e, gestureState) => {
-          // here we are setting the position of the gesture move. This will then re-render the view with the correct
-          //  background color
+          // here we are setting the position of the gesture move. 
+          // This will then re-render the view with the correct
+          // background color
           this.setState({
-            [`circle${i}PosX`]: gestureState.moveX,
             [`circle${i}PosY`]: gestureState.moveY
           });
   
@@ -77,20 +74,32 @@ export default class ColorPicker extends Component {
         },
 
         onPanResponderRelease: (e, gestureState) => {
-          
-          console.log(gestureState.moveX, gestureState.moveY)
 
-          if(gestureState.moveY > this.state.height - 100) {
+          const boundaryBottom = Dimensions.get('window').height - 200;
+          const boundaryTop = 100;
+
+          if(gestureState.moveY > boundaryBottom) {
             Animated.spring(selector, {
-              toValue: { y: 400 },
-              friction: 5
+              toValue: { y: boundaryBottom, x: 0 },
+              friction: 10
             }).start();
 
             this.setState({
-              // [`circle${i}PosX`]: gestureState.moveX,
-              [`circle${i}PosY`]: 400
-            });   
+              [`circle${i}PosY`]: boundaryBottom
+            });
           }
+
+          if(gestureState.moveY < boundaryTop) {
+            Animated.spring(selector, {
+              toValue: { y: boundaryTop, x: 0 },
+              friction: 10
+            }).start();
+
+            this.setState({
+              [`circle${i}PosY`]: boundaryTop
+            });
+          }
+
 
           selector.flattenOffset();
           this.updateBackgroundColor();
@@ -116,23 +125,19 @@ export default class ColorPicker extends Component {
     const { pan, scale } = this.state;
     const rotate = '0deg';
     let circle = {
-      circleStyle0: {},
-      circleStyle1: {},
-      circleStyle2: {},
-      circleTop0: 100,
-      circleTop1: 200,
-      circleTop2: 300,
-      circleLeft0: (this.state.width / 4) - 25,
-      circleLeft1: (this.state.width / 2) - 25,
-      circleLeft2: ((this.state.width / 4) * 3) - 25,
+      left0: (this.state.width / 4) - 25,
+      left1: (this.state.width / 2) - 25,
+      left2: ((this.state.width / 4) * 3) - 25,
     }
 
     // here we are looping through each pan and getting the translate and translateY for each one
     for(let i = 0; i < this.state.pans.length; i++) {
       const currentPan = pan[Object.keys(pan)[i]];
       const [translateX, translateY] = [currentPan.x, currentPan.y];
-      circle[`circleStyle${i}`] = {transform: [{translateX}, {translateY}, {rotate}, {scale}]};
-      circle[`Top${i}`] = translateY;
+      circle[`circleStyle${i}`] = {
+        transform: [{translateX}, {translateY}, {rotate}, {scale}],
+        left: circle[`left${i}`]
+      }
     }
 
     return (
@@ -151,9 +156,6 @@ export default class ColorPicker extends Component {
                   <Animated.View 
                     key={index} 
                     style={[
-                      { 'top': circle[`circleTop${index}`],
-                        'left': circle[`circleLeft${index}`]
-                      },
                       styles.colorPicker,
                       circle[`circleStyle${index}`]]}
                       {...this.state.pans[index].panHandlers}>
