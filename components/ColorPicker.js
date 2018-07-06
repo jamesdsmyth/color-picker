@@ -62,8 +62,23 @@ export default class ColorPicker extends Component {
           this.updateBackgroundColor();
         },
 
-        onPanResponderRelease: (e, {vx, vy}) => {
+        onPanResponderRelease: (e, gestureState) => {
+          
+          console.log(gestureState.moveX, gestureState.moveY)
+          if(gestureState.moveY > 300) {
+            Animated.spring(selector, {
+              toValue: { x: gestureState.moveX, y: 300 },
+              friction: 5
+            }).start();
+
+            this.setState({
+              [`circle${i}PosX`]: gestureState.moveX,
+              [`circle${i}PosY`]: 300
+            });   
+          }
+
           selector.flattenOffset();
+          this.updateBackgroundColor();
         }
       });
     }
@@ -115,16 +130,11 @@ export default class ColorPicker extends Component {
 
             {
               this.state.pans.map((pan, index) => {
-
-                const top = circle[`circleTop${index}`]
-
-                console.log(top);
-
                 return (
                   <Animated.View 
                     key={index} 
                     style={[
-                      { 'top': top },
+                      { 'top': circle[`circleTop${index}`] },
                       styles.colorPicker,
                       circle[`circleStyle${index}`]]}
                       {...this.state.pans[index].panHandlers}>
