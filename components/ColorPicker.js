@@ -26,7 +26,20 @@ export default class ColorPicker extends Component {
   }
 
   componentWillMount() {
+    this.randomiseColors();
     this.attachPanHandlerEvents();
+  }
+
+  randomiseColors() {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+
+    bgColor = [r, g, b];
+
+    this.setState({
+      bgColor
+    })
   }
 
   // using PanResponders built in functions, we will set up all the event listeners here
@@ -65,15 +78,16 @@ export default class ColorPicker extends Component {
         onPanResponderRelease: (e, gestureState) => {
           
           console.log(gestureState.moveX, gestureState.moveY)
-          if(gestureState.moveY > 300) {
+
+          if(gestureState.moveY > this.state.height - 100) {
             Animated.spring(selector, {
-              toValue: { x: gestureState.moveX, y: 300 },
+              toValue: { x: gestureState.moveX, y: 400 },
               friction: 5
             }).start();
 
             this.setState({
               [`circle${i}PosX`]: gestureState.moveX,
-              [`circle${i}PosY`]: 300
+              [`circle${i}PosY`]: 400
             });   
           }
 
@@ -104,9 +118,9 @@ export default class ColorPicker extends Component {
       circleStyle0: {},
       circleStyle1: {},
       circleStyle2: {},
-      circleTop0: 0,
-      circleTop1: 0,
-      circleTop2: 0
+      circleTop0: 100,
+      circleTop1: 200,
+      circleTop2: 300
     }
 
     // here we are looping through each pan and getting the translate and translateY for each one
@@ -130,11 +144,14 @@ export default class ColorPicker extends Component {
 
             {
               this.state.pans.map((pan, index) => {
+                const left = (index + 1) * 25;
                 return (
                   <Animated.View 
                     key={index} 
                     style={[
-                      { 'top': circle[`circleTop${index}`] },
+                      { 'top': circle[`circleTop${index}`],
+                        'left': `${left}%`
+                      },
                       styles.colorPicker,
                       circle[`circleStyle${index}`]]}
                       {...this.state.pans[index].panHandlers}>
