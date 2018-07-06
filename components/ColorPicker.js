@@ -15,6 +15,7 @@ export default class ColorPicker extends Component {
       scale: new Animated.Value(1),
       bgColor: [135, 12, 93],
       height: Dimensions.get('window').height,
+      width: Dimensions.get('window').width,
       circle0PosX: 0,
       circle0PosY: 0,
       circle1PosX: 0,
@@ -67,7 +68,7 @@ export default class ColorPicker extends Component {
           });
   
           Animated.event([null, {
-            dx: selector.x,
+            // dx: selector.x,
             dy: selector.y
           }])(e, gestureState);
   
@@ -81,12 +82,12 @@ export default class ColorPicker extends Component {
 
           if(gestureState.moveY > this.state.height - 100) {
             Animated.spring(selector, {
-              toValue: { x: gestureState.moveX, y: 400 },
+              toValue: { y: 400 },
               friction: 5
             }).start();
 
             this.setState({
-              [`circle${i}PosX`]: gestureState.moveX,
+              // [`circle${i}PosX`]: gestureState.moveX,
               [`circle${i}PosY`]: 400
             });   
           }
@@ -120,7 +121,10 @@ export default class ColorPicker extends Component {
       circleStyle2: {},
       circleTop0: 100,
       circleTop1: 200,
-      circleTop2: 300
+      circleTop2: 300,
+      circleLeft0: (this.state.width / 4) - 25,
+      circleLeft1: (this.state.width / 2) - 25,
+      circleLeft2: ((this.state.width / 4) * 3) - 25,
     }
 
     // here we are looping through each pan and getting the translate and translateY for each one
@@ -129,8 +133,6 @@ export default class ColorPicker extends Component {
       const [translateX, translateY] = [currentPan.x, currentPan.y];
       circle[`circleStyle${i}`] = {transform: [{translateX}, {translateY}, {rotate}, {scale}]};
       circle[`Top${i}`] = translateY;
-
-      console.log(circle)
     }
 
     return (
@@ -144,13 +146,13 @@ export default class ColorPicker extends Component {
 
             {
               this.state.pans.map((pan, index) => {
-                const left = (index + 1) * 25;
+
                 return (
                   <Animated.View 
                     key={index} 
                     style={[
                       { 'top': circle[`circleTop${index}`],
-                        'left': `${left}%`
+                        'left': circle[`circleLeft${index}`]
                       },
                       styles.colorPicker,
                       circle[`circleStyle${index}`]]}
