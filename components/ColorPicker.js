@@ -14,7 +14,7 @@ export default class ColorPicker extends Component {
       },
       scale: new Animated.Value(1),
       bgColor: [],
-      height: Dimensions.get('window').height,
+      height: Dimensions.get('window').height - 200,
       width: Dimensions.get('window').width,
       circle0PosY: 0,
       circle1PosY: 0,
@@ -75,7 +75,7 @@ export default class ColorPicker extends Component {
 
         onPanResponderRelease: (e, gestureState) => {
 
-          const boundaryBottom = Dimensions.get('window').height - 200;
+          const boundaryBottom = this.state.height;
           const boundaryTop = 100;
 
           if(gestureState.moveY > boundaryBottom) {
@@ -99,7 +99,6 @@ export default class ColorPicker extends Component {
               [`circle${i}PosY`]: boundaryTop
             });
           }
-
 
           selector.flattenOffset();
           this.updateBackgroundColor();
@@ -151,7 +150,6 @@ export default class ColorPicker extends Component {
 
             {
               this.state.pans.map((pan, index) => {
-
                 return (
                   <Animated.View 
                     key={index} 
@@ -159,16 +157,17 @@ export default class ColorPicker extends Component {
                       styles.colorPicker,
                       circle[`circleStyle${index}`]]}
                       {...this.state.pans[index].panHandlers}>
-                    <Text>
-                      {index === 0 && 'R'}
-                      {index === 1 && 'G'}
-                      {index === 2 && 'B'}
-                    </Text>
                   </Animated.View>
                 )
               })
             }
-            <Text>{this.state.bgColor[0]} {this.state.bgColor[1]} {this.state.bgColor[2]}</Text>
+            <View style={styles.colorCodeSection}>
+              <Text style={styles.colorCodeSectionText}>
+                {this.state.bgColor[0]}{' ,  '}
+                {this.state.bgColor[1]}{' ,  '} 
+                {this.state.bgColor[2]}
+              </Text>
+            </View>
         </View>
       </View>
     );
