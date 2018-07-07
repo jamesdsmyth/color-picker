@@ -127,9 +127,15 @@ export default class ColorPicker extends Component {
   updateBackgroundColor() {
     const colors = 255;
     const h = this.state.areaHeight;
-    const r = Math.round((colors / h) * this.state.circle0PosY);
-    const g = Math.round((colors / h) * this.state.circle1PosY);
-    const b = Math.round((colors / h) * this.state.circle2PosY);
+    let r = Math.round((colors / h) * this.state.circle0PosY);
+    let g = Math.round((colors / h) * this.state.circle1PosY);
+    let b = Math.round((colors / h) * this.state.circle2PosY);
+
+    // if we drag the circle further than the boundary it will give a value greater than 255
+    // we want to correct this
+    r  = r > 255 ? 255 : r;
+    g  = g > 255 ? 255 : g;
+    b  = b > 255 ? 255 : b;
 
     this.setState({
       bgColor: [r, g, b]
