@@ -157,7 +157,6 @@ export default class ColorPicker extends Component {
         left: this.state[`circle${i}Left`],
         // top: this.state[`circle${i}Top`]
       }
-
     }
 
     return (
