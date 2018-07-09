@@ -17,8 +17,7 @@ export default class ColorPicker extends Component {
       circle0PosY: 0,
       circle1PosY: 0,
       circle2PosY: 0,
-      responders: [this._panResponder, this._panResponder1, this._panResponder2],
-      initialised: false
+      responders: new Array(3) // we populate this array using PanResponder.create() function
     }
   }
 
