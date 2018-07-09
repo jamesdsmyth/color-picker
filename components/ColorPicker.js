@@ -3,8 +3,8 @@ import { View, Animated, Text, Dimensions, PanResponder } from 'react-native';
 import styles from '../styles/styles';
 
 export default class ColorPicker extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.state = {
       pan: {
@@ -12,16 +12,13 @@ export default class ColorPicker extends Component {
         two: new Animated.ValueXY(),
         three: new Animated.ValueXY()
       },
-      scale: new Animated.Value(1),
       bgColor: [],
       areaHeight: Dimensions.get('window').height - 200,
       circle0PosY: 0,
       circle1PosY: 0,
       circle2PosY: 0,
-      circle0Left: 0,
-      circle1Left: 0,
-      circle2Left: 0,
-      pans: [this._panResponder, this._panResponder1, this._panResponder2]
+      responders: [this._panResponder, this._panResponder1, this._panResponder2],
+      initialised: false
     }
   }
 
@@ -43,27 +40,32 @@ export default class ColorPicker extends Component {
       circle0Left: (Dimensions.get('window').width / 4) - 25,
       circle1Left: (Dimensions.get('window').width / 2) - 25,
       circle2Left: ((Dimensions.get('window').width / 4) * 3) - 25,
-      circle0Top: (percentage * r) + 80,
-      circle1Top: (percentage * g) + 80,
-      circle2Top: (percentage * b) + 80
+      circle0PosY: (percentage * r) + 80,
+      circle1PosY: (percentage * g) + 80,
+      circle2PosY: (percentage * b) + 80,
     })
+
+    this.state.pan.one.setOffset({x: 0, y: (percentage * r) + 80});
+    this.state.pan.one.flattenOffset()
+    this.state.pan.two.setOffset({x: 0, y: (percentage * g) + 80});
+    this.state.pan.two.flattenOffset()
+    this.state.pan.three.setOffset({x: 0, y: (percentage * b) + 80});
+    this.state.pan.three.flattenOffset()
   }
 
   // we loop through 3 circles to create 3 seperate pan responders
   attachPanHandlerEvents() {
-    for(let i = 0; i < this.state.pans.length; i++) {
+    for(let i = 0; i < this.state.responders.length; i++) {
 
       const selector = this.state.pan[Object.keys(this.state.pan)[i]];
 
-      this.state.pans[i] = PanResponder.create({
+      this.state.responders[i] = PanResponder.create({
         onMoveShouldSetResponderCapture: () => true,
         onMoveShouldSetPanResponderCapture: () => true,
 
         onPanResponderGrant: (e, gestureState) => {
           selector.setOffset({x: selector.x._value, y: selector.y._value});
-          // selector.setValue({x: 0, y: 0});
         },
-
 
         onPanResponderMove: (e, gestureState) => {
           // here we are setting the position of the gesture move. 
@@ -143,19 +145,16 @@ export default class ColorPicker extends Component {
   }
 
   render() {
-    const { pan, scale } = this.state;
-    const rotate = '0deg';
     let circle = {};
 
     // here we are looping through each pan and getting the translate and translateY for each one
-    for(let i = 0; i < this.state.pans.length; i++) {
-      const currentPan = pan[Object.keys(pan)[i]];
-      const [translateY] = [currentPan.y];
+    for(let i = 0; i < this.state.responders.length; i++) {
+      const currentPan = this.state.pan[Object.keys(this.state.pan)[i]];  
+      const translateX = this.state[`circle${i}Left`];
+      const translateY = currentPan.y;
 
       circle[`circleStyle${i}`] = {
-        transform: [{translateY}, {rotate}, {scale}],
-        left: this.state[`circle${i}Left`],
-        // top: this.state[`circle${i}Top`]
+        transform: [{translateY}, {translateX}]
       }
     }
 
@@ -169,14 +168,14 @@ export default class ColorPicker extends Component {
             ]}>
 
             {
-              this.state.pans.map((pan, index) => {
+              this.state.responders.map((pan, index) => {
                 return (
                   <Animated.View 
                     key={index} 
                     style={[
                       styles.colorPicker,
                       circle[`circleStyle${index}`]]}
-                      {...this.state.pans[index].panHandlers}>
+                      {...this.state.responders[index].panHandlers}>
                   </Animated.View>
                 )
               })
