@@ -14,6 +14,7 @@ export default class ColorPicker extends Component {
       },
       bgColor: [],
       areaHeight: Dimensions.get('window').height - 200,
+      marginTop: 80,
       circle0PosY: 0,
       circle1PosY: 0,
       circle2PosY: 0,
@@ -39,16 +40,16 @@ export default class ColorPicker extends Component {
       circle0Left: (Dimensions.get('window').width / 4) - 25,
       circle1Left: (Dimensions.get('window').width / 2) - 25,
       circle2Left: ((Dimensions.get('window').width / 4) * 3) - 25,
-      circle0PosY: (percentage * r) + 0,
-      circle1PosY: (percentage * g) + 0,
-      circle2PosY: (percentage * b) + 0,
+      circle0PosY: (percentage * r) + this.state.marginTop,
+      circle1PosY: (percentage * g) + this.state.marginTop,
+      circle2PosY: (percentage * b) + this.state.marginTop,
     })
 
-    this.state.pan.one.setOffset({x: 0, y: (percentage * r) + 0});
+    this.state.pan.one.setOffset({x: 0, y: (percentage * r) + this.state.marginTop });
     this.state.pan.one.flattenOffset()
-    this.state.pan.two.setOffset({x: 0, y: (percentage * g) + 0});
+    this.state.pan.two.setOffset({x: 0, y: (percentage * g) + this.state.marginTop });
     this.state.pan.two.flattenOffset()
-    this.state.pan.three.setOffset({x: 0, y: (percentage * b) + 0});
+    this.state.pan.three.setOffset({x: 0, y: (percentage * b) + this.state.marginTop });
     this.state.pan.three.flattenOffset()
   }
 
