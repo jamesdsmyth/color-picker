@@ -39,7 +39,9 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50,
     backgroundColor: '#ffffff',
-    position: 'absolute'
+    position: 'absolute',
+    borderWidth: 1,
+    borderColor: '#cccccc'
   }
 });
 
