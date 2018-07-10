@@ -39,16 +39,16 @@ export default class ColorPicker extends Component {
       circle0Left: (Dimensions.get('window').width / 4) - 25,
       circle1Left: (Dimensions.get('window').width / 2) - 25,
       circle2Left: ((Dimensions.get('window').width / 4) * 3) - 25,
-      circle0PosY: (percentage * r) + 80,
-      circle1PosY: (percentage * g) + 80,
-      circle2PosY: (percentage * b) + 80,
+      circle0PosY: (percentage * r) + 0,
+      circle1PosY: (percentage * g) + 0,
+      circle2PosY: (percentage * b) + 0,
     })
 
-    this.state.pan.one.setOffset({x: 0, y: (percentage * r) + 80});
+    this.state.pan.one.setOffset({x: 0, y: (percentage * r) + 0});
     this.state.pan.one.flattenOffset()
-    this.state.pan.two.setOffset({x: 0, y: (percentage * g) + 80});
+    this.state.pan.two.setOffset({x: 0, y: (percentage * g) + 0});
     this.state.pan.two.flattenOffset()
-    this.state.pan.three.setOffset({x: 0, y: (percentage * b) + 80});
+    this.state.pan.three.setOffset({x: 0, y: (percentage * b) + 0});
     this.state.pan.three.flattenOffset()
   }
 
