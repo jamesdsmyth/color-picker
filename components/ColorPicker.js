@@ -3,8 +3,8 @@ import { View, Animated, Text, Dimensions, PanResponder } from 'react-native';
 import styles from '../styles/styles';
 
 export default class ColorPicker extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       pan: {
@@ -12,45 +12,65 @@ export default class ColorPicker extends Component {
         two: new Animated.ValueXY(),
         three: new Animated.ValueXY()
       },
-      bgColor: [],
-      areaHeight: Dimensions.get('window').height - 200,
+      bgColor: this.props.setColor,
+      height: this.props.height,
       marginTop: 80,
-      circle0PosY: 0,
-      circle1PosY: 0,
-      circle2PosY: 0,
-      responders: new Array(3) // we populate this array using PanResponder.create() function
+      responders: new Array(3), // we populate this array using PanResponder.create() function
+      showRgbValues: this.props.showRgbValues
     }
   }
 
+  // get a random color and then attach all the handlers.
   componentWillMount() {
-    this.randomiseColors();
+    if(this.state.bgColor) {
+      this.setPropColor();
+    } else {
+      this.setRandomColor();
+    }
+    
     this.attachPanHandlerEvents();
   }
 
-  randomiseColors() {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    const percentage = this.state.areaHeight / 255;
+  setPropColor() {
+    if(this.state.bgColor.length === 3) {
+      this.setColorState(this.state.bgColor);
+    } else {
+      this.setRandomColor();
+    }
+  }
 
-    bgColor = [r, g, b];
+  setColorState(bgColor) {
+    const percentage = this.state.height / 255;
+    const width = Dimensions.get('window').width;
+    const posY0 = (percentage * bgColor[0]) + this.state.marginTop;
+    const posY1 = (percentage * bgColor[1]) + this.state.marginTop;
+    const posY2 = (percentage * bgColor[2]) + this.state.marginTop;
 
     this.setState({
       bgColor,
-      circle0Left: (Dimensions.get('window').width / 4) - 25,
-      circle1Left: (Dimensions.get('window').width / 2) - 25,
-      circle2Left: ((Dimensions.get('window').width / 4) * 3) - 25,
-      circle0PosY: (percentage * r) + this.state.marginTop,
-      circle1PosY: (percentage * g) + this.state.marginTop,
-      circle2PosY: (percentage * b) + this.state.marginTop,
+      circle0Left: (width / 4) - 25,
+      circle1Left: (width / 2) - 25,
+      circle2Left: ((width / 4) * 3) - 25,
+      circle0PosY: posY0,
+      circle1PosY: posY1,
+      circle2PosY: posY2
     })
 
-    this.state.pan.one.setOffset({x: 0, y: (percentage * r) + this.state.marginTop });
-    this.state.pan.one.flattenOffset()
-    this.state.pan.two.setOffset({x: 0, y: (percentage * g) + this.state.marginTop });
-    this.state.pan.two.flattenOffset()
-    this.state.pan.three.setOffset({x: 0, y: (percentage * b) + this.state.marginTop });
-    this.state.pan.three.flattenOffset()
+    this.state.pan.one.setOffset({ x: 0, y: posY0 });
+    this.state.pan.one.flattenOffset();
+    this.state.pan.two.setOffset({ x: 0, y: posY1 });
+    this.state.pan.two.flattenOffset();
+    this.state.pan.three.setOffset({ x: 0, y: posY2 });
+    this.state.pan.three.flattenOffset();
+  }
+
+  // if setColor is not set, then we create a random color
+  setRandomColor() {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    
+    this.setColorState([r, g, b]);
   }
 
   // we loop through 3 circles to create 3 seperate pan responders
@@ -86,7 +106,7 @@ export default class ColorPicker extends Component {
         // on release, if the current cirlce is outside the boundaries we will
         // move it back to the edge of the boundary and then reset the color
         onPanResponderRelease: (e, gestureState) => {
-          const boundaryBottom = this.state.areaHeight;
+          const boundaryBottom = this.state.height;
           const boundaryTop = 80;
 
           if(gestureState.moveY > boundaryBottom) {
@@ -128,7 +148,7 @@ export default class ColorPicker extends Component {
   // getting the correct RGB values using the position of each of the circles
   updateBackgroundColor() {
     const colors = 255;
-    const h = this.state.areaHeight;
+    const h = this.state.height;
     let r = Math.round((colors / h) * this.state.circle0PosY);
     let g = Math.round((colors / h) * this.state.circle1PosY);
     let b = Math.round((colors / h) * this.state.circle2PosY);
@@ -142,6 +162,9 @@ export default class ColorPicker extends Component {
     this.setState({
       bgColor: [r, g, b]
     });
+
+    // if the 'returnColor' function is passed, then we return the color
+    this.props.returnColor && this.props.returnColor([r, g, b]);
   }
 
   render() {
@@ -164,7 +187,9 @@ export default class ColorPicker extends Component {
           style={
             [
               styles.colorPickerContainer,
-              { 'backgroundColor': `rgb(${this.state.bgColor[0]}, ${this.state.bgColor[1]}, ${this.state.bgColor[2]})`}
+              { 'backgroundColor': `rgb(${this.state.bgColor[0]}, ${this.state.bgColor[1]}, ${this.state.bgColor[2]})`,
+                'height': this.state.height
+              }
             ]}>
 
             {
@@ -180,15 +205,23 @@ export default class ColorPicker extends Component {
                 )
               })
             }
-            <View style={styles.colorCodeSection}>
-              <Text style={styles.colorCodeSectionText}>
-                {this.state.bgColor[0]}{' ,  '}
-                {this.state.bgColor[1]}{' ,  '} 
-                {this.state.bgColor[2]}
-              </Text>
-            </View>
+            {this.state.showRgbValues &&
+              <View style={styles.colorCodeSection}>
+                <Text style={styles.colorCodeSectionText}>
+                  {this.state.bgColor[0]}{' ,  '}
+                  {this.state.bgColor[1]}{' ,  '} 
+                  {this.state.bgColor[2]}
+                </Text>
+              </View>
+            }
         </View>
       </View>
     );
   }
 }
+
+ColorPicker.defaultProps = {
+  height: Dimensions.get('window').height - 200, // for the top and bottom padding
+  showRgbValues: true,
+  bgColor: []
+};
