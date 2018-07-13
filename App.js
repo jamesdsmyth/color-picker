@@ -18,7 +18,7 @@ export default class App extends Component {
           hideRgbValues
           // height={400}
           returnColor={this.getColor}
-          // setColor={[0, 25, 134]}
+          // color={[0, 25, 134]}
         />
       </View>
     );
