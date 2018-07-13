@@ -16,7 +16,7 @@ export default class ColorPicker extends Component {
       height: this.props.height,
       marginTop: 80,
       responders: new Array(3), // we populate this array using PanResponder.create() function
-      showRgbValues: this.props.showRgbValues
+      hideRgbValues: this.props.hideRgbValues
     }
   }
 
@@ -205,7 +205,7 @@ export default class ColorPicker extends Component {
                 )
               })
             }
-            {this.state.showRgbValues &&
+            {!this.state.hideRgbValues &&
               <View style={styles.colorCodeSection}>
                 <Text style={styles.colorCodeSectionText}>
                   {this.state.bgColor[0]}{' ,  '}
@@ -222,6 +222,6 @@ export default class ColorPicker extends Component {
 
 ColorPicker.defaultProps = {
   height: Dimensions.get('window').height - 200, // for the top and bottom padding
-  showRgbValues: true,
+  hideRgbValues: true,
   bgColor: []
 };

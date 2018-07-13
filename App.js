@@ -15,7 +15,7 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <ColorPicker 
-          // showRgbValues
+          hideRgbValues
           // height={400}
           returnColor={this.getColor}
           // setColor={[0, 25, 134]}
