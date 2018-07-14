@@ -67,6 +67,7 @@ export default class ColorPicker extends Component {
     const posY1 = (percentage * bgColor[1]) + this.state.boundaryTop;
     const posY2 = (percentage * bgColor[2]) + this.state.boundaryTop;
 
+    // cannot be set using setState()
     this.state.pan.one.setOffset({ x: 0, y: posY0 });
     this.state.pan.one.flattenOffset();
     this.state.pan.two.setOffset({ x: 0, y: posY1 });
